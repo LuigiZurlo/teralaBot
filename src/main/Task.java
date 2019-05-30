@@ -23,6 +23,8 @@ import java.util.logging.Logger;
 import json.*;
 import util.ManagerDB;
 import util.QueryParameter;
+import util.PostJson;
+
 
 /**
  *
@@ -71,7 +73,7 @@ public class Task {
         List<Datum> d = new ArrayList<>();
         d.add(ric);
         r.setData(d);
-        toJson(r, "C:\\Users\\LuigiZ\\Desktop\\prova.json");
+        postJson(r, "C:\\Users\\LuigiZ\\Desktop\\prova.json");
 
 //        }
     }
@@ -84,7 +86,7 @@ public class Task {
         List<Datum> data = new ArrayList<>();
         for (Location l : ((List<Location>) (List<?>) (locations))) {
             Datum ric = new Datum("PA-" + l.getSensor().getPrimaryPurpleairId());
-            System.out.println("Scarico misure sensore " + l.getSensor().getDisplayName() );
+            System.out.println("Scarico misure sensore " + l.getSensor().getDisplayName());
             queryParameters.add(new QueryParameter("location_id", l.getId()));
             List<Measurementavg> mis = (List<Measurementavg>) (List<?>) ManagerDB.getObjectList(Query.GET_LAST_SENSOR_MEASURE, queryParameters);
 
@@ -98,19 +100,18 @@ public class Task {
 
                 ric.addData(dato);
             }
-            
+
             data.add(ric);
             queryParameters.clear();
         }
-        
+
         r.setData(data);
-        
-        toJson(r,"C:\\Users\\LuigiZ\\Desktop\\provaDefault.json");
+
+        postJson(r, "C:\\Users\\LuigiZ\\Desktop\\provaDefault.json");
 
     }
 
     public void createJsonSensor() {
-        String root = "C:\\Users\\LuigiZ\\Desktop\\jsons\\";
 
         ArrayList<QueryParameter> queryParameters = new ArrayList<>();
         List<Location> locations = (List<Location>) (List<?>) ManagerDB.getObjectList(Query.GET_LOCATION_TO_UPDATE, queryParameters);
@@ -118,8 +119,14 @@ public class Task {
             String code = "PA-" + location.getSensor().getPrimaryPurpleairId();
             RegisterEnvironmentDevice dev = new RegisterEnvironmentDevice(code);
             RegisterEnvironmentDeviceLocation loc = new RegisterEnvironmentDeviceLocation(code, location.getGeolocation().getY(), location.getGeolocation().getX(), location.getElevation(), location.getSensor().getDisplayName());
-            toJson(dev, root + RegisterEnvironmentDevice.class.getSimpleName() + code + ".json");
-            toJson(loc, root + RegisterEnvironmentDeviceLocation.class.getSimpleName() + code + ".json");
+            // per file
+            //        String root = "C:\\Users\\LuigiZ\\Desktop\\jsons\\";
+//            jsonToFile(dev, root + RegisterEnvironmentDevice.class.getSimpleName() + code + ".json");
+//            jsonToFile(loc, root + RegisterEnvironmentDeviceLocation.class.getSimpleName() + code + ".json");  
+
+            //POST request
+            postJson(dev, constant.EndPoint.REGISTER_DEVICE);
+            postJson(loc, constant.EndPoint.REGISTER_LOCATION);
         }
 
     }
@@ -136,10 +143,24 @@ public class Task {
 
     }
 
-    private void toJson(Object o, String f) {
+    private void postJson(Object o, String f) {
+        ObjectMapper m = new ObjectMapper();
+
+        try {
+            // 	String jsonString = mapper.writeValueAsString(object);
+//            m.writeValue(new File(f), o);
+            PostJson.Post_JSON(f, m.writeValueAsString(o));
+        } catch (IOException ex) {
+            Logger.getLogger(Task.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void jsonToFile(Object o, String f) {
         ObjectMapper m = new ObjectMapper();
         try {
+
             m.writeValue(new File(f), o);
+
         } catch (IOException ex) {
             Logger.getLogger(Task.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -19,9 +19,21 @@ public class Run {
     public static void main(String[] args) throws IOException {
         // TODO code application logic here
         Task t = new Task();
-//        t.runTask();
-//        t.createJsonSensor();
+
         t.runDefault();
+        switch (args[0]) {
+            case "sl": // upload locations e sensori
+                t.createJsonSensor();
+                break;
+            case "past":
+                t.runPast();
+                break;
+            case "default":
+                t.runDefault();
+                break;
+            default:
+                break;
+        }
     }
 
 }

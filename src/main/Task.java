@@ -6,12 +6,10 @@
 package main;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.javafx.scene.control.skin.VirtualFlow;
 import constant.Query;
 import domain.Location;
 import domain.Measurementavg;
 import domain.Parameter2;
-import domain.Sensor;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;

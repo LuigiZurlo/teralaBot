@@ -118,13 +118,13 @@ public class Task {
             RegisterEnvironmentDevice dev = new RegisterEnvironmentDevice(code);
             RegisterEnvironmentDeviceLocation loc = new RegisterEnvironmentDeviceLocation(code, location.getGeolocation().getY(), location.getGeolocation().getX(), location.getElevation(), location.getSensor().getDisplayName());
             // per file
-            //        String root = "C:\\Users\\LuigiZ\\Desktop\\jsons\\";
-//            jsonToFile(dev, root + RegisterEnvironmentDevice.class.getSimpleName() + code + ".json");
-//            jsonToFile(loc, root + RegisterEnvironmentDeviceLocation.class.getSimpleName() + code + ".json");  
+                    String root = "/Users/luigizurlo/Desktop/jsons/";
+            jsonToFile(dev, root + RegisterEnvironmentDevice.class.getSimpleName() + code + ".json");
+            jsonToFile(loc, root + RegisterEnvironmentDeviceLocation.class.getSimpleName() + code + ".json");  
 
             //POST request
-            postJson(dev, constant.EndPoint.REGISTER_DEVICE);
-            postJson(loc, constant.EndPoint.REGISTER_LOCATION);
+//            postJson(dev, constant.EndPoint.REGISTER_DEVICE);
+//            postJson(loc, constant.EndPoint.REGISTER_LOCATION);
         }
 
     }

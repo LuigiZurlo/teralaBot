@@ -25,4 +25,5 @@ public class Query {
     
     public static final String GET_LAST_SENSOR_MEASURE = "from Measurementavg where location_id= :location_id and timestamp=(select max(timestamp)from Measurementavg where location_id= :location_id)";
      
+    public static final String GET_LAST_MEASURES = "from Measurementavg where location_id= :location_id and timestamp= :timestamp";
 }

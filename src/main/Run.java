@@ -20,7 +20,6 @@ public class Run {
         // TODO code application logic here
         Task t = new Task();
 
-        t.runDefault();
         switch (args[0]) {
             case "sl": // upload locations e sensori
                 t.createJsonSensor();

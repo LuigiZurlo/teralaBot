@@ -37,6 +37,11 @@ public class Data {
 
     public Data(String variableName, String measuredUnit) {
         this.variableName = variableName;
+//        this.values = new ArrayList<>();
+    }
+    
+     public Data(String variableName) {
+        this.variableName = variableName;
         this.measuredUnit = measuredUnit;
 //        this.values = new ArrayList<>();
     }

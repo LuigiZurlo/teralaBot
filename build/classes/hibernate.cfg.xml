@@ -10,7 +10,7 @@
   <session-factory>
     <!-- Database connection settings -->
     <property name="connection.driver_class">org.postgresql.Driver</property>
-    <property name="connection.url">jdbc:postgresql://localhost:5433/pulse_pds?rewriteBatchedStatements=true</property>
+    <property name="connection.url">jdbc:postgresql://localhost:5432/pulse_pds?rewriteBatchedStatements=true</property>
     <!--<property name="connection.url">jdbc:postgresql://localhost:5432/pulse_pds</property>-->
     <property name="connection.username">postgres</property>
     <property name="connection.password">p6ls3d3b14n</property>

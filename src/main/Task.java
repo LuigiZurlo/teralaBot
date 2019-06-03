@@ -7,6 +7,8 @@ package main;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import constant.Constants;
+import static constant.Constants.sdf;
+import constant.EndPoint;
 import constant.Query;
 import domain.Location;
 import domain.Measurementavg;
@@ -53,8 +55,7 @@ public class Task {
                     Data variabile = new Data(getParameterName(mis.get(0).getParameter()));
                     List<Value> valori = new ArrayList<>();
                     for (Measurementavg mi : mis) {
-                        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        valori.add(new Value(mi.getValore(), dateFormat.format(mi.getTimestamp())));
+                        valori.add(new Value(mi.getValore(), sdf.format(mi.getTimestamp())));
                     }
                     variabile.setValues(valori);
                     parametri.add(variabile);
@@ -64,7 +65,8 @@ public class Task {
                 List<Datum> d = new ArrayList<>();
                 d.add(ric);
                 r.setData(d);
-                jsonToFile(r, "jsons/" + l.getSensor().getPrimaryPurpleairId() + "PAR"+ mis.get(0).getParameter().getCode() + ".json");
+                postJson(r, EndPoint.UPLOAD_MESURES);
+//                jsonToFile(r, "jsons/" + l.getSensor().getPrimaryPurpleairId() + "PAR"+ mis.get(0).getParameter().getCode() + ".json");
             }
 
         }
@@ -73,22 +75,22 @@ public class Task {
     public void runDefault() {
         ArrayList<QueryParameter> queryParameters = new ArrayList<>();
         List<Object> locations = ManagerDB.getObjectList(Query.GET_LOCATION_TO_UPDATE, queryParameters);
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
+      
         Request r = new Request();
         List<Datum> data = new ArrayList<>();
         for (Location l : ((List<Location>) (List<?>) (locations))) {
+           
             Datum ric = new Datum("PA-" + l.getSensor().getPrimaryPurpleairId());
             System.out.println("Scarico misure sensore " + l.getSensor().getDisplayName());
             queryParameters.add(new QueryParameter("location_id", l.getId()));
-            queryParameters.add(new QueryParameter("timestamp", DateManager.truncate(new Date().getTime(), Constants.SLICE_TIME)));
+            queryParameters.add(new QueryParameter("timestamp", DateManager.truncate(new Date(), Constants.SLICE_TIME)));
             List<Measurementavg> mis = (List<Measurementavg>) (List<?>) ManagerDB.getObjectList(Query.GET_LAST_MEASURES, queryParameters);
 
             for (Measurementavg mi : mis) {
 
                 List<Value> valori = new ArrayList<>();
 
-                valori.add(new Value(mi.getValore(), dateFormat.format(mi.getTimestamp())));
+                valori.add(new Value(mi.getValore(), sdf.format(mi.getTimestamp())));
                 Data dato = new Data(getParameterName(mi.getParameter()));
                 dato.setValues(valori);
 
@@ -101,8 +103,9 @@ public class Task {
         }
 
         r.setData(data);
-        jsonToFile(r, "jsons/provaDati.json");
-//        postJson(r, "jsons/provaDefault.json");
+//        jsonToFile(r, "jsons/provaDati.json");
+
+        postJson(r, constant.EndPoint.UPLOAD_MESURES);
 
     }
 

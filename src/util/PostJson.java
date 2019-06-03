@@ -5,11 +5,13 @@
  */
 package util;
 
+import static constant.Constants.sdf;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Date;
 import org.apache.commons.io.IOUtils;
 
 public class PostJson {
@@ -22,6 +24,7 @@ public class PostJson {
         try {
             URL url = new URL(query_url);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            
             conn.setConnectTimeout(5000);
             conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             conn.setDoOutput(true);
@@ -32,7 +35,8 @@ public class PostJson {
             os.close();
             InputStream in = new BufferedInputStream(conn.getInputStream());
             String result = IOUtils.toString(in, "UTF-8");
-            System.out.println(result);
+            int codeR = conn.getResponseCode();
+            System.out.println(sdf.format(new Date())+ " response: " + codeR + (codeR!=200?("-"+conn.getResponseMessage()):""));
             in.close();
             conn.disconnect();
         } catch (Exception e) {

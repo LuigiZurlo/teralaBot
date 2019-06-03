@@ -5,10 +5,13 @@
  */
 package constant;
 
+import java.text.SimpleDateFormat;
+
 /**
  *
  * @author cristianalarizza
  */
 public class Constants {
    public static final int SLICE_TIME = 10;
+   public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 }

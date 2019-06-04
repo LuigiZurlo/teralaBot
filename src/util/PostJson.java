@@ -13,6 +13,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
 import org.apache.commons.io.IOUtils;
+import static constant.Constants.getTimeFormat;
 
 public class PostJson {
 
@@ -36,7 +37,8 @@ public class PostJson {
             InputStream in = new BufferedInputStream(conn.getInputStream());
             String result = IOUtils.toString(in, "UTF-8");
             int codeR = conn.getResponseCode();
-            System.out.println(sdf.format(new Date())+ " response: " + codeR + (codeR!=200?("-"+conn.getResponseMessage()):""));
+            
+            System.out.println(getTimeFormat().format(new Date())+ " response: " + codeR + (codeR!=200?("-"+conn.getResponseMessage()):""));
             in.close();
             conn.disconnect();
         } catch (Exception e) {

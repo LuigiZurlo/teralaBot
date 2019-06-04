@@ -7,7 +7,8 @@ package main;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import constant.Constants;
-import static constant.Constants.sdf;
+import static constant.Constants.getTimeFormat;
+
 import constant.EndPoint;
 import constant.Query;
 import domain.Location;
@@ -15,8 +16,6 @@ import domain.Measurementavg;
 import domain.Parameter2;
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,7 +54,7 @@ public class Task {
                     Data variabile = new Data(getParameterName(mis.get(0).getParameter()));
                     List<Value> valori = new ArrayList<>();
                     for (Measurementavg mi : mis) {
-                        valori.add(new Value(mi.getValore(), sdf.format(mi.getTimestamp())));
+                        valori.add(new Value(mi.getValore(), getTimeFormat().format(mi.getTimestamp())));
                     }
                     variabile.setValues(valori);
                     parametri.add(variabile);
@@ -89,8 +88,9 @@ public class Task {
             for (Measurementavg mi : mis) {
 
                 List<Value> valori = new ArrayList<>();
-
-                valori.add(new Value(mi.getValore(), sdf.format(mi.getTimestamp())));
+     System.out.println("tz "+getTimeFormat().format(mi.getTimestamp())+  "  no Format "+mi.getTimestamp());
+                  
+                valori.add(new Value(mi.getValore(), getTimeFormat().format(mi.getTimestamp())));
                 Data dato = new Data(getParameterName(mi.getParameter()));
                 dato.setValues(valori);
 
@@ -103,9 +103,9 @@ public class Task {
         }
 
         r.setData(data);
-//        jsonToFile(r, "jsons/provaDati.json");
+        jsonToFile(r, "jsons/provaDati.json");
 
-        postJson(r, constant.EndPoint.UPLOAD_MESURES);
+//        postJson(r, constant.EndPoint.UPLOAD_MESURES);
 
     }
 

@@ -5,10 +5,8 @@
  */
 package domain;
 
-import com.sun.scenario.effect.Offset;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;

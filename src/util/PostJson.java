@@ -17,7 +17,7 @@ import static constant.Constants.getTimeFormat;
 
 public class PostJson {
 
-    public static void Post_JSON(String reqUrl, String js) {
+    public static void post_JSON(String reqUrl, String js) {
 
         // 	String jsonString = mapper.writeValueAsString(object);
         String query_url = reqUrl;
@@ -38,7 +38,7 @@ public class PostJson {
             String result = IOUtils.toString(in, "UTF-8");
             int codeR = conn.getResponseCode();
             
-            System.out.println(getTimeFormat().format(new Date())+ " response: " + codeR + (codeR!=200?("-"+conn.getResponseMessage()):""));
+            System.out.println("\t"+getTimeFormat().format(new Date())+ " response: " + codeR + (codeR!=200?("-"+conn.getResponseMessage()):""));
             in.close();
             conn.disconnect();
         } catch (Exception e) {

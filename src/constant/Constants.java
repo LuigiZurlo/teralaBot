@@ -15,10 +15,10 @@ import java.util.TimeZone;
 public class Constants {
 
    public static final int SLICE_TIME = 10;
-   public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss'X'");
+   public static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
    public static SimpleDateFormat getTimeFormat() {
-      sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+      sdf.setTimeZone(TimeZone.getTimeZone( "UTC" ) );
       return sdf;
    }
 

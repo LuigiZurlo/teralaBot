@@ -23,7 +23,8 @@ public class FilterMeasurements {
       System.out.println("parametro = " + list.get(0).getParameter().getCode());
       for(Measurementavg m:list){
          th.setMonth(m.getTimestamp().getMonth());
-         if(!(m.getValore().compareTo(th.getMin(m.getParameter().getCode()))>=0 
+          // controllo sui valori fuori range
+           if(!(m.getValore().compareTo(th.getMin(m.getParameter().getCode()))>=0 
                  && m.getValore().compareTo(th.getMax(m.getParameter().getCode()))<=0)){
             System.out.println( m.getValore()+ " "+ Constants.getTimeFormat().format(m.getTimestamp()));
             toRemove.add(m);

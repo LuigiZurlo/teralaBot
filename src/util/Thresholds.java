@@ -17,11 +17,11 @@ import java.util.Map;
 public class Thresholds {
 
    private Map<String, Ths> t;
-   private int thTemp[] = {-13, -13, -4, 0, 0, 8, 10, 10, 8, 5, -2, -8};
+   private int thTemp[] = {-13, -13, -5, 0, 5, 8, 10, 10, 8, 5, -2, -8};
 
    public Thresholds() {
       t = new HashMap<>();
-      t.put("temperature", new Ths(new BigDecimal(-10), new BigDecimal(40)));
+      t.put("temperature", new Ths(new BigDecimal(-10), new BigDecimal(45)));
       t.put("pressure", new Ths(new BigDecimal(90000), new BigDecimal(104000)));
       t.put("humidity", new Ths(new BigDecimal(0), new BigDecimal(100)));
       t.put("pm1", new Ths(new BigDecimal(0), new BigDecimal(1000)));

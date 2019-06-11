@@ -28,6 +28,9 @@ public class Run {
          case "sl": // upload locations e sensori
             t.createJsonSensor();
             break;
+         case "single_sl": // upload location e dati di un solo sensore
+            t.createJsonSensor(args[1]);
+            break;
          case "past":
             System.out.println(" - upload past data");
             t.runPast();

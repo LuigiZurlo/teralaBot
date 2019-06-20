@@ -16,6 +16,8 @@ import domain.Measurementavg;
 import domain.Parameter2;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -35,9 +37,18 @@ import util.Thresholds;
  */
 public class Task {
 
+   private static String OUTPUT_FORMAT;
    private static final String TEMPERATURE = "air_temperature";
    private static final String PRESSURE = "atmospheric_pressure";
    private static Thresholds th = new Thresholds();
+
+   public Task(String mode) {
+      if (!(mode.equals("json")
+              || mode.equals("post"))) {
+         throw new IllegalArgumentException(Run.help());
+      }
+      OUTPUT_FORMAT = mode;
+   }
 
    public void runPast() throws IOException {
       ArrayList<QueryParameter> queryParameters = new ArrayList<>();
@@ -48,6 +59,8 @@ public class Task {
          Datum ric = new Datum("PA-" + l.getSensor().getPrimaryPurpleairId());
          for (int i = 1; i < 7; i++) {
             List<Data> parametri = new ArrayList<>();
+            // aggiunto clear (era un errore?)
+            queryParameters = new ArrayList<>();
             queryParameters.add(new QueryParameter("location_id", l.getId()));
             queryParameters.add(new QueryParameter("param_id", i));
 
@@ -68,9 +81,117 @@ public class Task {
             List<Datum> d = new ArrayList<>();
             d.add(ric);
             r.setData(d);
-            postJson(r, EndPoint.UPLOAD_MESURES);
-//            jsonToFile(r, "jsons/" + l.getSensor().getPrimaryPurpleairId() + "PAR" + mis.get(0).getParameter().getCode() + ".json");
+            switch (OUTPUT_FORMAT) {
+               case "json":
+                  jsonToFile(r, "jsons/" + l.getSensor().getPrimaryPurpleairId() + "PAR" + mis.get(0).getParameter().getCode() + ".json");
+                  break;
+               case "post":
+                  postJson(r, EndPoint.UPLOAD_MESURES);
+                  break;
+               default:
+                  System.out.println("Invalid option!");
+                  break;
+            }
          }
+
+      }
+   }
+
+   public void runPast(String start, String end) throws IOException, ParseException {
+
+      ArrayList<QueryParameter> queryParameters = new ArrayList<>();
+      List<Object> locations = ManagerDB.getObjectList(Query.GET_LOCATION_TO_UPDATE, queryParameters);
+      for (Location l : ((List<Location>) (List<?>) (locations))) {
+         queryParameters = new ArrayList<>();
+         System.out.println("PA-" + l.getSensor().getPrimaryPurpleairId());
+         Datum ric = new Datum("PA-" + l.getSensor().getPrimaryPurpleairId());
+         SimpleDateFormat sd = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
+         for (int i = 1; i < 7; i++) {
+            List<Data> parametri = new ArrayList<>();
+            queryParameters.add(new QueryParameter("location_id", l.getId()));
+            queryParameters.add(new QueryParameter("param_id", i));
+            queryParameters.add(new QueryParameter("start", sd.parse(start)));
+            queryParameters.add(new QueryParameter("end", sd.parse(end)));
+
+            List<Measurementavg> mis = (List<Measurementavg>) (List<?>) ManagerDB.getObjectList(Query.GET_SENSOR_MEASURES_BY_PERIOD, queryParameters);
+            mis = FilterMeasurements.filterOut(mis, th);
+            System.out.println(getParameterName(mis.get(0).getParameter()) + ": " + mis.size() + " measurements ");
+            if (!mis.isEmpty()) {
+               Data variabile = new Data(getParameterName(mis.get(0).getParameter()));
+               List<Value> valori = new ArrayList<>();
+               for (Measurementavg mi : mis) {
+                  valori.add(new Value(mi.getValore(), getTimeFormat().format(mi.getTimestamp())));
+               }
+               variabile.setValues(valori);
+               parametri.add(variabile);
+            }
+            ric.setData(parametri);
+            Request r = new Request();
+            List<Datum> d = new ArrayList<>();
+            d.add(ric);
+            r.setData(d);
+            switch (OUTPUT_FORMAT) {
+               case "json":
+                  jsonToFile(r, "jsons/" + l.getSensor().getPrimaryPurpleairId() + "PAR" + mis.get(0).getParameter().getCode() + ".json");
+                  break;
+               case "post":
+                  postJson(r, EndPoint.UPLOAD_MESURES);
+                  break;
+               default:
+                  System.out.println("Invalid option!");
+                  break;
+            }
+//         
+         }
+
+      }
+   }
+
+   public void runPast(String sensor_id, String start, String end) throws IOException, ParseException {
+
+      ArrayList<QueryParameter> queryParameters = new ArrayList<>();
+      queryParameters.add(new QueryParameter("location_id", Long.parseLong(sensor_id)));
+      List<Object> locations = ManagerDB.getObjectList(Query.GET_LOCATION_BY_ID, queryParameters);
+      Location l = (Location) locations.get(0);
+      System.out.println("PA-" + l.getSensor().getPrimaryPurpleairId());
+      Datum ric = new Datum("PA-" + l.getSensor().getPrimaryPurpleairId());
+      SimpleDateFormat sd = new SimpleDateFormat("dd-MM-yyyy-HH:mm:ss");
+      for (int i = 1; i < 7; i++) {
+         List<Data> parametri = new ArrayList<>();
+//         queryParameters.add(new QueryParameter("location_id", sensor_id));
+         queryParameters.add(new QueryParameter("param_id", i));
+         queryParameters.add(new QueryParameter("start", sd.parse(start)));
+         queryParameters.add(new QueryParameter("end", sd.parse(end)));
+
+         List<Measurementavg> mis = (List<Measurementavg>) (List<?>) ManagerDB.getObjectList(Query.GET_SENSOR_MEASURES_BY_PERIOD, queryParameters);
+         mis = FilterMeasurements.filterOut(mis, th);
+         System.out.println(getParameterName(mis.get(0).getParameter()) + ": " + mis.size() + " measurements ");
+         if (!mis.isEmpty()) {
+            Data variabile = new Data(getParameterName(mis.get(0).getParameter()));
+            List<Value> valori = new ArrayList<>();
+            for (Measurementavg mi : mis) {
+               valori.add(new Value(mi.getValore(), getTimeFormat().format(mi.getTimestamp())));
+            }
+            variabile.setValues(valori);
+            parametri.add(variabile);
+         }
+         ric.setData(parametri);
+         Request r = new Request();
+         List<Datum> d = new ArrayList<>();
+         d.add(ric);
+         r.setData(d);
+         switch (OUTPUT_FORMAT) {
+            case "json":
+               jsonToFile(r, "jsons/" + l.getSensor().getPrimaryPurpleairId() + "PAR" + mis.get(0).getParameter().getCode() + ".json");
+               break;
+            case "post":
+               postJson(r, EndPoint.UPLOAD_MESURES);
+               break;
+            default:
+               System.out.println("Invalid option!");
+               break;
+         }
+//         
 
       }
    }
@@ -113,13 +234,22 @@ public class Task {
       }
 
       r.setData(data);
-//      jsonToFile(r, "jsons/provaDati.json");
 
-      postJson(r, constant.EndPoint.UPLOAD_MESURES);
+      switch (OUTPUT_FORMAT) {
+         case "json":
+            jsonToFile(r, "jsons/provaDati.json");
+            break;
+         case "post":
+            postJson(r, constant.EndPoint.UPLOAD_MESURES);
+            break;
+         default:
+            System.out.println("Invalid option!");
+            break;
+      }
    }
 
    public void createJsonSensor() {
-     
+
       ArrayList<QueryParameter> queryParameters = new ArrayList<>();
       List<Location> locations = (List<Location>) (List<?>) ManagerDB.getObjectList(Query.GET_LOCATION_TO_UPDATE, queryParameters);
       for (Location location : locations) {
@@ -127,36 +257,50 @@ public class Task {
          RegisterEnvironmentDevice dev = new RegisterEnvironmentDevice(code);
          RegisterEnvironmentDeviceLocation loc = new RegisterEnvironmentDeviceLocation(code, location.getGeolocation().getY(), location.getGeolocation().getX(), location.getElevation(), location.getSensor().getDisplayName());
          // per file
-                    String root = "jsons/";
-//            jsonToFile(dev, root + RegisterEnvironmentDevice.class.getSimpleName() + code + ".json");
-//            jsonToFile(loc, root + RegisterEnvironmentDeviceLocation.class.getSimpleName() + code + ".json");  
+         String root = "jsons/";
+         switch (OUTPUT_FORMAT) {
+            case "json":
+               jsonToFile(dev, root + RegisterEnvironmentDevice.class.getSimpleName() + code + ".json");
+               jsonToFile(loc, root + RegisterEnvironmentDeviceLocation.class.getSimpleName() + code + ".json");
+               break;
+            case "post":
+               postJson(dev, constant.EndPoint.REGISTER_DEVICE);
+               postJson(loc, constant.EndPoint.REGISTER_LOCATION);
+               break;
+            default:
+               System.out.println("Invalid option!");
+               break;
+         }
 
-//         POST request
-         postJson(dev, constant.EndPoint.REGISTER_DEVICE);
-         postJson(loc, constant.EndPoint.REGISTER_LOCATION);
       }
    }
 
-   public void createJsonSensor(String sensor_id) {
-      int id = Integer.parseInt(sensor_id);
-      System.out.println("sensore = "+id);
+   public void createJsonSensor(String location_id) {
+      int id = Integer.parseInt(location_id);
+      System.out.println("location = " + id);
       ArrayList<QueryParameter> queryParameters = new ArrayList<>();
       List<Location> locations = (List<Location>) (List<?>) ManagerDB.getObjectList(Query.GET_LOCATION_TO_UPDATE, queryParameters);
       for (Location location : locations) {
-         if (id != location.getId()) {
-            continue;
-         } else {
+         if (id == location.getId()) {
             String code = "PA-" + location.getSensor().getPrimaryPurpleairId();
             RegisterEnvironmentDevice dev = new RegisterEnvironmentDevice(code);
             RegisterEnvironmentDeviceLocation loc = new RegisterEnvironmentDeviceLocation(code, location.getGeolocation().getY(), location.getGeolocation().getX(), location.getElevation(), location.getSensor().getDisplayName());
             // per file
             String root = "jsons/";
-//            jsonToFile(dev, root + RegisterEnvironmentDevice.class.getSimpleName() + code + ".json");
-//            jsonToFile(loc, root + RegisterEnvironmentDeviceLocation.class.getSimpleName() + code + ".json");
 
-//         POST request
-         postJson(dev, constant.EndPoint.REGISTER_DEVICE);
-         postJson(loc, constant.EndPoint.REGISTER_LOCATION);
+            switch (OUTPUT_FORMAT) {
+               case "json":
+                  jsonToFile(dev, root + RegisterEnvironmentDevice.class.getSimpleName() + code + ".json");
+                  jsonToFile(loc, root + RegisterEnvironmentDeviceLocation.class.getSimpleName() + code + ".json");
+                  break;
+               case "post":
+                  postJson(dev, constant.EndPoint.REGISTER_DEVICE);
+                  postJson(loc, constant.EndPoint.REGISTER_LOCATION);
+                  break;
+               default:
+                  System.out.println("Invalid option!");
+                  break;
+            }
          }
       }
    }
